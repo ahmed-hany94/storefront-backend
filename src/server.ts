@@ -1,30 +1,22 @@
-import express, { Request, Response } from "express";
-import bodyParser from "body-parser";
-import { Pool } from "pg";
+import express, { Express, Request, Response } from 'express';
+import { PORT } from './constants';
+import { connect_db } from './db';
+import { router } from './routes';
 
-import dotenv from "dotenv";
+// Connect to database
+(async function () {
+  if ((await connect_db()) === false) {
+    process.exit(process.exitCode);
+  }
+})();
 
-dotenv.config();
+// Setup express server
+const app: Express = express();
 
-const { POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB } =
-  process.env;
+app.use(router);
 
-const client = new Pool({
-  host: POSTGRES_HOST,
-  database: POSTGRES_DB,
-  user: POSTGRES_USER,
-  password: POSTGRES_PASSWORD,
+app.listen(PORT, function () {
+  console.log(`Listening on http://localhost:${PORT}`);
 });
 
-const app: express.Application = express();
-const address: string = "0.0.0.0:3000";
-
-app.use(bodyParser.json());
-
-app.get("/", function (req: Request, res: Response) {
-  res.send("Hello World!");
-});
-
-app.listen(3000, function () {
-  console.log(`starting app on: ${address}`);
-});
+export { app };
