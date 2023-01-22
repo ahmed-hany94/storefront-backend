@@ -19,9 +19,8 @@ const createProducts = async function (req: Request, res: Response) {
   try {
     const { name, price } = req.body;
     const client = await getConnection();
-    await client.query(
-      `INSERT INTO "products" (name, price) VALUES ('${name}', ${price});`
-    );
+    const query = 'INSERT INTO "products" (name, price) VALUES ($1, $2);';
+    await client.query(query, [name, price]);
     client.release();
     res.status(200).json({ message: 'Product inserted.' });
   } catch (err) {
@@ -39,21 +38,20 @@ const productByID = async function (
 ) {
   try {
     const client = await getConnection();
-    const result = await client.query(
-      `SELECT * FROM "products" WHERE id = '${id}';`
-    );
+    const query = 'SELECT * FROM "products" WHERE id = $1;';
+    const result = await client.query(query, [id]);
 
     if (result.rows.length) {
       const product = result.rows[0];
       res.locals.product = product;
       next();
     } else {
-      res.status(400).json({ message: 'Could not get product.' });
+      res.status(400).json({ message: 'Failed to retrieve product.' });
     }
   } catch (err) {
     // TODO: better error message
     console.log(err);
-    res.status(400).json({ message: "Couldn't retrieve product" });
+    res.status(400).json({ message: 'Failed to retrieve product.' });
   }
 };
 
@@ -61,4 +59,4 @@ const getProduct = async function (req: Request, res: Response) {
   res.status(200).json({ message: res.locals.product });
 };
 
-export { listProducts, createProducts, productByID, getProduct };
+export { createProducts, getProduct, listProducts, productByID };

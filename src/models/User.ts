@@ -8,7 +8,9 @@ const UserSchemaError = {
   usernameIsNotUnique: 'Username is not unique.',
   firstnameIsMissing: 'Firstname is missing.',
   lastnameIsMissing: 'Lastname is missing.',
-  passwordIsMissing: 'Password is missing.'
+  passwordIsMissing: 'Password is missing.',
+
+  authorizationFailed: 'Authorization token verification failed.'
 };
 
 type UserSchema = {
@@ -57,7 +59,6 @@ const User = function (requestBody: Request['body']): UserSchema {
 };
 
 const authenticate = function (user: UserSchema, password: string): string {
-  console.log(user);
   if (compareSync(password + BCRYPT_SECRET, user.hash)) {
     const token = sign({ user: user }, JWT_SECRET as string);
     return token;
@@ -72,7 +73,9 @@ const authorize = function (token: string): UserSchema {
     return user as UserSchema;
   } catch (err) {
     console.log(err);
-    return {} as UserSchema;
+    return {
+      error: UserSchemaError.authorizationFailed
+    } as UserSchema;
   }
 };
-export { UserSchema, User, authenticate, authorize };
+export { authenticate, authorize, User, UserSchema };

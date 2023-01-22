@@ -3,14 +3,14 @@
     "driver": "pg",
     "host": { "ENV": "POSTGRES_HOST" },
     "database": { "ENV": "POSTGRES_DB_NAME" },
-    "user": { "ENV": "POSTGRES_USER" },
+    "user": "postgres",
     "password": { "ENV": "POSTGRES_PASSWORD" }
   },
   "test": {
     "driver": "pg",
     "host": { "ENV": "POSTGRES_HOST" },
     "database": { "ENV": "POSTGRES_TEST_DB_NAME" },
-    "user": { "ENV": "POSTGRES_USER" },
+    "user": "postgres",
     "password": { "ENV": "POSTGRES_PASSWORD" }
   }
 }

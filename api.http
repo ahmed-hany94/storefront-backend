@@ -1,5 +1,6 @@
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjg0NjUzNjItNDUyYS00ZDg3LWIwNzktODBiNDM5ZDhmZTYyIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkTGE0R0lJRVhmZk4xYmYyZ2kvUUJJZUYuNzZSd2lRMDJmUjVJaXEvTjlvQU1SUGx1N1R1T1MifSwiaWF0IjoxNjc0MzU5NjQ4fQ.faMFQ71xlxrmQwhKilJ4RPdr1uZN_Dag_1jFvI9ce38
-
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiMWViZGQwNjctMTU1Ny00ZTYwLThmNWQtZTc4ZmIzMTlkNTQzIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkUTAzRFF0aWNTWEgvNTZvb05DYS9LdWouSlo3eldGU0ptaGNhQk10ekpnZFBpSjludlBkOXEifSwiaWF0IjoxNjc0NDIwMzY1fQ.39XpmDdExlpmBmUWXhKSwC11iFR8Ehh4U3nwuGS1gHA
+@userID = 1ebdd067-1557-4e60-8f5d-e78fb319d543
+@productID = 16a2a050-5b7a-433b-b4d3-fe599e70ed08
 ####################################################################
 # User SignUp
 POST http://localhost:3000/api/users
@@ -20,7 +21,26 @@ Authorization: {{token}}
 
 ####################################################################
 # Get User By ID
-GET http://localhost:3000/api/users/68465362-452a-4d87-b079-80b439d8fe62
+GET http://localhost:3000/api/users/{{userID}}
+Content-Type: application/json
+Authorization: {{token}}
+
+####################################################################
+# Update User
+PUT http://localhost:3000/api/users/{{userID}}
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+      "username": "a_hany",
+      "firstName": "ahmed",
+      "lastName": "hany",
+      "password": "ahmed_password"
+}
+
+####################################################################
+# Delete User
+DELETE http://localhost:3000/api/users/{{userID}}
 Content-Type: application/json
 Authorization: {{token}}
 
@@ -51,13 +71,30 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "name": "product",
+  "name": "product1",
   "price": 9.99
 }
 
 ####################################################################
 # Create Product by ID
-GET http://localhost:3000/api/products/d6f55f5d-3f20-469a-abc7-f1bc0437dbf7
+GET http://localhost:3000/api/products/{{productID}}
 Content-Type: application/json
+
+####################################################################
+# Create a User's order
+POST http://localhost:3000/api/users/{{userID}}/orders
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "product_id": "987f24fa-467d-403e-8fc9-8c50d700c13a",
+  "status": "active"
+}
+
+####################################################################
+# Get a User's order
+GET http://localhost:3000/api/users/{{userID}}/orders
+Content-Type: application/json
+Authorization: {{token}}
 
 ####################################################################

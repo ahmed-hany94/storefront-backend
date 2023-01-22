@@ -14,12 +14,19 @@ import {
   productByID,
   getProduct
 } from '../controllers/productsCtrl';
+import { createUserOrder, getUserOrder } from '../services';
 
 const router: Router = express.Router();
 
 // auth
 router.route('/auth/login').post(login);
 router.route('/auth/logout').get(logout);
+
+// user's order
+router
+  .route('/users/:userID/orders')
+  .get(isAuthenticated, hasAuthroization, getUserOrder)
+  .post(isAuthenticated, hasAuthroization, createUserOrder);
 
 // users
 router

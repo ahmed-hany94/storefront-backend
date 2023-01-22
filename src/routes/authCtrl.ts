@@ -1,6 +1,6 @@
 import { CookieOptions, NextFunction, Request, Response } from 'express';
 import { getConnection } from '../db';
-import { authenticate, authorize, UserSchema } from '../model/User';
+import { authenticate, authorize, UserSchema } from '../models/User';
 
 const isAuthenticated = async function (
   req: Request,
@@ -11,16 +11,16 @@ const isAuthenticated = async function (
     const authorizationHeader = req.headers.authorization as string;
     const token = authorizationHeader.split(' ')[1];
     const user = authorize(token);
-    if (user) {
-      res.locals.user = user;
-      next();
+    if (user.error) {
+      res.status(401).json({ message: user.error });
     } else {
-      res.status(401).json({ message: 'User is not authorized' });
+      res.locals.authenticated_user = user;
+      next();
     }
   } catch (err) {
     // TODO: better error message
     console.log(err);
-    res.status(401).json({ message: 'User is not authorized.' });
+    res.status(401).json({ message: 'User is not authenticated.' });
   }
 };
 
@@ -30,8 +30,11 @@ const hasAuthroization = async function (
   next: NextFunction
 ) {
   try {
-    if (res.locals.authId) {
-      //   TODO: check that auth here
+    if (
+      res.locals.profile &&
+      res.locals.authenticated_user.user &&
+      res.locals.profile.id === res.locals.authenticated_user.user.id
+    ) {
       next();
     } else {
       res.status(401).json({ message: 'User is not authorized.' });
@@ -49,9 +52,8 @@ const login = async function (req: Request, res: Response) {
 
     if (username && password) {
       const client = await getConnection();
-      const result = await client.query(
-        `SELECT * FROM "users" WHERE username='${username}';`
-      );
+      const query = 'SELECT * FROM "users" WHERE username = $1;';
+      const result = await client.query(query, [username]);
 
       // TODO: Would like to assert/test that only one result
       //       returns as username is supposed to be unique
@@ -95,4 +97,4 @@ const login = async function (req: Request, res: Response) {
 
 const logout = async function (req: Request, res: Response) {};
 
-export { login, logout, isAuthenticated, hasAuthroization };
+export { hasAuthroization, isAuthenticated, login, logout };
