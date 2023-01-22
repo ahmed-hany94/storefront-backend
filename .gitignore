@@ -1,5 +1,5 @@
 todo.txt
-config/database.json
+config/*.json
 
 # Logs
 logs

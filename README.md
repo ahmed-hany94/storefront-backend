@@ -2,18 +2,6 @@
 
 ## Getting Started
 
-```bash
-npm install -g db-migrate
-
-npm install -g db-migrate-pg
-```
-
-```bash
-docker pull postgres
-
-docker run --name pg -p 5432:5432 -e POSTGRES_PASSWORD=supersecretpassword -e POSTGRES_USER=store_admin -e POSTGRES_DB=store_db_dev -e POSTGRES_TEST_DB=store_db_test -d postgres
-```
-
 This repo contains a basic Node and Express app to get you started in constructing an API. To get started, clone this repo and run `yarn` in your terminal at the project root.
 
 ## Required Technologies

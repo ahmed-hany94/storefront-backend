@@ -7,11 +7,11 @@
     "start": "nodemon src/server.ts",
     "build": "npx tsc",
     "build-and-run": "npx tsc && node ./build/index.js",
-    "jasmine": "set PORT=3001 && jasmine",
-    "test": "npm run build && npm run jasmine",
+    "jasmine": "set ENV=test && db-migrate --env test up && set PORT=3001 && jasmine && db-migrate db:drop test",
+    "test": "yarn run build && yarn run jasmine",
     "lint": "eslint . --config .eslintrc --ext .ts",
     "prettier": "prettier --config .prettierrc \"src/**/*.ts\" --write",
-    "check": "npm run prettier && npm run lint"
+    "check": "yarn run prettier && yarn run lint"
   },
   "repository": {
     "type": "git",
@@ -24,8 +24,12 @@
   "author": "Ahmed Hany",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.1",
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
+    "jsonwebtoken": "^9.0.0",
     "pg": "^8.5.1"
   },
   "devDependencies": {
@@ -36,6 +40,8 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
+    "db-migrate": "^0.11.13",
+    "db-migrate-pg": "^1.2.2",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",

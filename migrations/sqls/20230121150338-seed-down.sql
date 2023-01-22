@@ -1,0 +1,5 @@
+DROP TABLE products;
+DROP TABLE orders;
+DROP TABLE users;
+
+DROP TYPE "ORDER_STATUS";
