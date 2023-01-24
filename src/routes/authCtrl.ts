@@ -55,19 +55,18 @@ const login = async function (req: Request, res: Response) {
       const query = 'SELECT * FROM "users" WHERE username = $1;';
       const result = await client.query(query, [username]);
 
-      // TODO: Would like to assert/test that only one result
-      //       returns as username is supposed to be unique
       if (result.rows.length) {
         const user = result.rows[0] as UserSchema;
 
         const token = authenticate(user, password);
+        console.log(token);
 
         if (token) {
-          // TODO: http-only
           const date = new Date();
           date.setDate(date.getDate() + 1);
           res.cookie('t', token, {
-            expire: date
+            expire: date,
+            httpOnly: true
           } as CookieOptions);
           res
             .status(200)
@@ -95,6 +94,9 @@ const login = async function (req: Request, res: Response) {
   }
 };
 
-const logout = async function (req: Request, res: Response) {};
+const logout = async function (req: Request, res: Response) {
+  res.clearCookie('t');
+  res.status(200).json({ message: 'User signed out.' });
+};
 
 export { hasAuthroization, isAuthenticated, login, logout };

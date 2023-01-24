@@ -78,4 +78,4 @@ const authorize = function (token: string): UserSchema {
     } as UserSchema;
   }
 };
-export { authenticate, authorize, User, UserSchema };
+export { UserSchema, User, authenticate, authorize };

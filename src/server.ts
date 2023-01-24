@@ -1,5 +1,6 @@
-import express, { Express, json, Request, Response } from 'express';
-import { PORT } from './constants';
+import express, { Express, json } from 'express';
+import cookieParser from 'cookie-parser';
+import { PORT } from './modules/constants';
 import { connect_db } from './db';
 import { router } from './routes';
 
@@ -14,6 +15,7 @@ import { router } from './routes';
 const app: Express = express();
 
 app.use(json());
+app.use(cookieParser());
 
 app.use('/api', router);
 

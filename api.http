@@ -1,4 +1,4 @@
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiMWViZGQwNjctMTU1Ny00ZTYwLThmNWQtZTc4ZmIzMTlkNTQzIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkUTAzRFF0aWNTWEgvNTZvb05DYS9LdWouSlo3eldGU0ptaGNhQk10ekpnZFBpSjludlBkOXEifSwiaWF0IjoxNjc0NDIwMzY1fQ.39XpmDdExlpmBmUWXhKSwC11iFR8Ehh4U3nwuGS1gHA
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiMWViZGQwNjctMTU1Ny00ZTYwLThmNWQtZTc4ZmIzMTlkNTQzIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkUTAzRFF0aWNTWEgvNTZvb05DYS9LdWouSlo3eldGU0ptaGNhQk10ekpnZFBpSjludlBkOXEifSwiaWF0IjoxNjc0NDU2NzU1fQ.Nbx0_hpIoYi0rSNP1g0xhfjalSu2VCbROLVzVbmR5VU
 @userID = 1ebdd067-1557-4e60-8f5d-e78fb319d543
 @productID = 16a2a050-5b7a-433b-b4d3-fe599e70ed08
 ####################################################################

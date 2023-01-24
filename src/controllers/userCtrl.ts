@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { User, UserSchema } from '../models/User';
-import { getConnection } from '../db';
+import { getConnection, insertQuery, selectQuery } from '../db';
+import {
+  DATABASE_STATUS_MESSAGES,
+  USER_STATUS_MESSAGES
+} from '../modules/constants';
 
 const createUser = async function (req: Request, res: Response) {
   try {
@@ -9,21 +13,27 @@ const createUser = async function (req: Request, res: Response) {
     if (user.error) {
       res.status(400).json({ message: user.error });
     }
-    const client = await getConnection();
     const query =
       'INSERT INTO "users" (username, firstname, lastname, hash) VALUES ($1, $2, $3, $4);';
 
-    await client.query(query, [
+    const status = await insertQuery(query, [
       user.username,
       user.firstName,
       user.lastName,
       user.hash
     ]);
-    client.release();
-    res.status(200).json({ message: 'User added.' });
+
+    if (status === DATABASE_STATUS_MESSAGES.insert_success) {
+      res.status(200).json({
+        message: USER_STATUS_MESSAGES.user_created_succes,
+        body: user
+      });
+    } else {
+      res.status(400).json({ message: status });
+    }
   } catch (err) {
     res.status(400).json({
-      message: err
+      message: USER_STATUS_MESSAGES.user_created_failed
     });
   }
 };
@@ -67,14 +77,18 @@ const getUser = async function (req: Request, res: Response) {
 
 const getUsers = async function (req: Request, res: Response) {
   try {
-    const client = await getConnection();
-    const result = await client.query(`SELECT * FROM "users";`);
-    if (result.rows.length) {
-      client.release();
-      res.status(200).json(result.rows);
-    } else {
+    const query = 'SELECT * FROM "users";';
+    const result = await selectQuery(query, []);
+    if (result!.error) {
       res.status(404).json({ message: 'No users were found.' });
+    } else {
     }
+    // if (result.rows.length) {
+    //   client.release();
+    //   res.status(200).json(result.rows);
+    // } else {
+    //   res.status(404).json({ message: 'No users were found.' });
+    // }
   } catch (err) {
     console.log(err);
     res.status(400).json({

@@ -1,0 +1,55 @@
+[X] login
+[X] sign-up
+[X] get all products
+[X] get product by id
+[X] create product + authorization
+[X] get all users + authorization
+[X] user by id + authorization
+[X] prepared query
+[X] /users/:userID/orders
+[X] user to delete himself + authorization
+[X] user to update himself + authorization
+[X] testing db docker
+=================================
+[] refactor user update for the switch stmt to build the query string
+[-] logout
+[-] returned token, make it http-only + research security
+[-] logging
+    [] replace console.log with logger
+[-] testing
+[-] delineate between models and controllers ??
+[-] delineate between database and controllers ?? (expose db functions)
+[-] Make good error handling message (search for all TODOs)
+[] created_at
+[] updates_at
+[] uuid are a bit long, research for something shorter
+[] Add middleware for express [helmet, compress, cors]
+[] comment code
+[] order imports
+[] see how a real database is like
+[] try on another laptop
+[] insert many (search for any insert operation & handle many inserts)
+[] [optional] completed order by user + authorization
+[] [optional] get top most popular products
+[] [optional] products by category
+[] [optional] add a user 5 most recent product endpoints
+[] [optional] add a popular products endpoint returning 5 most commonly ordered items
+[] check sql column data type (VARCHAR)
+[] Write another migration script for inserting/deleting after every thing is working
+   and you have committed you work to have a save point.
+[] Check requirements.md
+[] Check readme.md
+=================================
+[] ask about scale
+[] ask about sharding
+[] ask about error handling
+
+I have a somewhat meta-question.
+My code got accepted and everything, but I don't know if this code
+is acceptable in a real-world setting where things are run on "scale".
+This makes this course being called "advanced" a bit disappointing.
+I appreciate that we are being taught the "best practices" but it still
+feels like a hello-world-get-started app that I wouldn't have the confidence
+to sell to people.
+In short, code works in a single-user tested, local app developed, tutorial hand-held
+way, not so sure for a real-world setting (a cigarette kiosk damn near even)?

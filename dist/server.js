@@ -58,10 +58,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 var express_1 = __importStar(require("express"));
-var constants_1 = require("./constants");
+var cookie_parser_1 = __importDefault(require("cookie-parser"));
+var constants_1 = require("./modules/constants");
 var db_1 = require("./db");
 var routes_1 = require("./routes");
 // Connect to database
@@ -83,6 +87,7 @@ var routes_1 = require("./routes");
 var app = (0, express_1.default)();
 exports.app = app;
 app.use((0, express_1.json)());
+app.use((0, cookie_parser_1.default)());
 app.use('/api', routes_1.router);
 app.listen(constants_1.PORT, function () {
     console.log("Listening on http://localhost:".concat(constants_1.PORT));
