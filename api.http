@@ -1,6 +1,6 @@
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiMWViZGQwNjctMTU1Ny00ZTYwLThmNWQtZTc4ZmIzMTlkNTQzIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkUTAzRFF0aWNTWEgvNTZvb05DYS9LdWouSlo3eldGU0ptaGNhQk10ekpnZFBpSjludlBkOXEifSwiaWF0IjoxNjc0NDU2NzU1fQ.Nbx0_hpIoYi0rSNP1g0xhfjalSu2VCbROLVzVbmR5VU
-@userID = 1ebdd067-1557-4e60-8f5d-e78fb319d543
-@productID = 16a2a050-5b7a-433b-b4d3-fe599e70ed08
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiZDgxNDQ5YWYtOWIxMi00OTAzLTkxZWEtOTQ5MGUzMGMyNDAwIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkeTVaVmxQMFVlZS9iRzNyQkNPeXE5dVhoZi9lZ0FIQUoyZWUwbmRMd3FoZTVnSzJoS2ozL2EifSwiaWF0IjoxNjc0NjcxOTMzfQ.E_fg5c2RMozR1mgcQD49lXJMfNYACl_IKBbPLHYf-vU
+@userID = d81449af-9b12-4903-91ea-9490e30c2400
+@productID = 
 ####################################################################
 # User SignUp
 POST http://localhost:3000/api/users

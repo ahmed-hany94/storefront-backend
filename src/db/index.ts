@@ -1,4 +1,5 @@
-import { Pool, PoolClient, PoolConfig } from 'pg';
+import { Pool, PoolClient, PoolConfig, QueryResult, QueryResultRow } from 'pg';
+import { UserSchema } from '../models/User';
 import {
   DB_PORT,
   POSTGRES_DB_NAME,
@@ -10,6 +11,63 @@ import {
   DATABASE_STATUS_MESSAGES
 } from '../modules/constants';
 
+interface IUser extends QueryResultRow {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  hash: string;
+}
+
+const selectOne = async function (
+  query: string,
+  params: string[]
+): Promise<IUser[] | void> {
+  try {
+    const client = await getConnection();
+    return client
+      .query<IUser[]>(query, params)
+      .then((res) => {
+        const rows: IUser[][] = res.rows;
+
+        if (rows.length === 0)
+          throw Error(DATABASE_STATUS_MESSAGES.select_success_but_empty);
+
+        return rows[0];
+      })
+      .catch((err) => {
+        console.log(err);
+        throw Error(DATABASE_STATUS_MESSAGES.select_failed);
+      });
+  } catch (err) {
+    console.log(err);
+    throw Error(DATABASE_STATUS_MESSAGES.select_failed);
+  }
+};
+
+const selectAll = async function (query: string): Promise<IUser[][] | void> {
+  try {
+    const client = await getConnection();
+    return client
+      .query<IUser[]>(query)
+      .then((res) => {
+        const rows: IUser[][] = res.rows;
+
+        if (rows.length === 0)
+          throw Error(DATABASE_STATUS_MESSAGES.select_success_but_empty);
+
+        return rows;
+      })
+      .catch((err) => {
+        console.log(err);
+        throw Error(DATABASE_STATUS_MESSAGES.select_failed);
+      });
+  } catch (err) {
+    console.log(err);
+    throw Error(DATABASE_STATUS_MESSAGES.select_failed);
+  }
+};
+
 const selectQuery = async function (query: string, params: string[]) {
   try {
     const client = await getConnection();
@@ -18,16 +76,19 @@ const selectQuery = async function (query: string, params: string[]) {
       .then((res) => {
         if (res.rows.length) {
           return res;
-        } else {
-          return { error: DATABASE_STATUS_MESSAGES.select_success_but_empty };
         }
+        // TODO: check this
+        // else {
+        //   return { error: DATABASE_STATUS_MESSAGES.select_success_but_empty };
+        // }
       })
       .catch((err) => {
-        return { error: err.message };
+        console.log(err);
+        throw Error(DATABASE_STATUS_MESSAGES.select_failed);
       });
   } catch (err) {
     console.log(err);
-    return { error: DATABASE_STATUS_MESSAGES.select_failed };
+    throw Error(DATABASE_STATUS_MESSAGES.select_failed);
   }
 };
 
@@ -74,13 +135,13 @@ const getConnection = async function (): Promise<PoolClient> {
 };
 
 const connect_db = async function (): Promise<Boolean> {
-  try {
-    const client = await getConnection();
-    console.log('Database Connected Successfully');
+  const client = await getConnection();
+  if (Object.keys(client).length) {
+    console.log('Database Initialized Successfully');
     client.release();
     return true;
-  } catch (err) {
-    console.log(err);
+  } else {
+    console.log('Database Initialization failed');
     return false;
   }
 };
@@ -90,4 +151,12 @@ const releaseClient = async function () {
   client.release();
 };
 
-export { connect_db, getConnection, insertQuery, releaseClient, selectQuery };
+export {
+  connect_db,
+  getConnection,
+  insertQuery,
+  releaseClient,
+  selectQuery,
+  selectAll,
+  selectOne
+};

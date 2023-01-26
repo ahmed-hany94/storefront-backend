@@ -59,7 +59,6 @@ const login = async function (req: Request, res: Response) {
         const user = result.rows[0] as UserSchema;
 
         const token = authenticate(user, password);
-        console.log(token);
 
         if (token) {
           const date = new Date();

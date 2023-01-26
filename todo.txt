@@ -11,6 +11,7 @@
 [X] user to update himself + authorization
 [X] testing db docker
 =================================
+[] refactor res.local
 [] refactor user update for the switch stmt to build the query string
 [-] logout
 [-] returned token, make it http-only + research security
@@ -38,7 +39,7 @@
 [] Write another migration script for inserting/deleting after every thing is working
    and you have committed you work to have a save point.
 [] Check requirements.md
-[] Check readme.md
+[] Check readme.md (add .env)
 =================================
 [] ask about scale
 [] ask about sharding

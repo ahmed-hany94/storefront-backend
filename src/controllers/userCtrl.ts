@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { User, UserSchema } from '../models/User';
-import { getConnection, insertQuery, selectQuery } from '../db';
+import { User } from '../models/User';
+import { getConnection, insertQuery, selectAll, selectOne } from '../db';
 import {
   DATABASE_STATUS_MESSAGES,
   USER_STATUS_MESSAGES
@@ -39,56 +39,74 @@ const createUser = async function (req: Request, res: Response) {
 };
 
 const userByID = async function (
-  req: Request,
+  _: Request,
   res: Response,
   next: NextFunction,
   id: string
 ) {
   try {
-    const client = await getConnection();
     const query = 'SELECT * FROM "users" WHERE id = $1;';
-    const result = await client.query(query, [id]);
-
-    if (result.rows.length) {
-      const user = result.rows[0] as UserSchema;
-      res.locals.profile = user;
+    const result = await selectOne(query, [id]);
+    if (result) {
+      res.locals.profile = result;
       next();
     } else {
-      res.status(400).json({ message: 'Failed to retrieve user.' });
+      res
+        .status(404)
+        .json({ message: USER_STATUS_MESSAGES.user_retrieval_failed });
     }
   } catch (err) {
-    // TODO: better error message
     console.log(err);
-    res.status(400).json({ message: 'Failed to retrieve user.' });
+    res.status(400).json({
+      message: err
+    });
   }
+
+  // try {
+  //   const client = await getConnection();
+  //   const query = 'SELECT * FROM "users" WHERE id = $1;';
+  //   const result = await client.query(query, [id]);
+
+  //   if (result.rows.length) {
+  //     const user = result.rows[0] as UserSchema;
+  //     res.locals.profile = user;
+  //     next();
+  //   } else {
+  //     res
+  //       .status(400)
+  //       .json({ message: USER_STATUS_MESSAGES.user_retrieval_failed });
+  //   }
+  // } catch (err) {
+  //   // TODO: better error message
+  //   console.log(err);
+  //   res
+  //     .status(400)
+  //     .json({ message: USER_STATUS_MESSAGES.user_retrieval_failed });
+  // }
 };
 
-const getUser = async function (req: Request, res: Response) {
+const getUser = async function (_: Request, res: Response) {
   try {
-    const userLocal = res.locals.user;
+    // TODO: res.locals is too much right now
+    const userLocal = res.locals.authenticated_user;
     delete userLocal.user.hash;
     res.status(200).json({ message: userLocal.user });
   } catch (err) {
     // TODO: better error message
     console.log(err);
-    res.status(400).json({ message: 'Failed to retrieve user.' });
+    res
+      .status(400)
+      .json({ message: USER_STATUS_MESSAGES.user_retrieval_failed });
   }
 };
 
-const getUsers = async function (req: Request, res: Response) {
+const getUsers = async function (_: Request, res: Response) {
   try {
     const query = 'SELECT * FROM "users";';
-    const result = await selectQuery(query, []);
-    if (result!.error) {
-      res.status(404).json({ message: 'No users were found.' });
-    } else {
-    }
-    // if (result.rows.length) {
-    //   client.release();
-    //   res.status(200).json(result.rows);
-    // } else {
-    //   res.status(404).json({ message: 'No users were found.' });
-    // }
+    const result = await selectAll(query);
+    // TODO: fix this
+    // console.log('2', result);
+    if (result) res.status(200).json(result);
   } catch (err) {
     console.log(err);
     res.status(400).json({
@@ -102,33 +120,48 @@ const updateUser = async function (req: Request, res: Response) {
     const user_id = res.locals.authenticated_user.user.id;
     if (user_id) {
       const client = await getConnection();
-      Object.entries(req.body).forEach(async (entry) => {
+      let query = `UPDATE users SET `;
+      let params = [];
+      Object.entries(req.body).forEach(async (entry, index) => {
         switch (entry[0]) {
           case 'username': {
-            const query = 'UPDATE users SET username = $1 WHERE id = $2';
-            await client.query(query, [entry[1], user_id]);
+            query +=
+              index === 0
+                ? `username = $${index + 1}`
+                : `, username = $${index + 1}`;
+            params.push(entry[1]);
             break;
           }
           case 'firstName': {
-            const query = 'UPDATE users SET firstName = $1 WHERE id = $2';
-            await client.query(query, [entry[1], user_id]);
+            query +=
+              index === 0
+                ? `firstname = $${index + 1}`
+                : `, firstname = $${index + 1}`;
+            params.push(entry[1]);
             break;
           }
           case 'lastName': {
-            const query = 'UPDATE users SET lastName = $1 WHERE id = $2';
-            await client.query(query, [entry[1], user_id]);
+            query +=
+              index === 0
+                ? `lastname = $${index + 1}`
+                : `, lastname = $${index + 1}`;
+            params.push(entry[1]);
             break;
           }
           case 'password': {
             // TODO: rehash password and all that jazz.
-            // const query = 'UPDATE users SET password = $1 WHERE user_id = $2';
-            // await client.query(query, [entry[1], user_id]);
+            query +=
+              index === 0 ? `hash = $${index + 1}` : `, hash = $${index + 1}`;
+            params.push(entry[1]);
             break;
           }
           default:
             res.status(400).json({ message: 'Bad parameter.' });
         }
       });
+      query += ` WHERE id = $${params.length + 1}`;
+      params.push(user_id);
+      await client.query(query, params);
       client.release();
       res.status(200).json({ message: 'Updated User.' });
     } else {
@@ -140,7 +173,7 @@ const updateUser = async function (req: Request, res: Response) {
   }
 };
 
-const deleteUser = async function (req: Request, res: Response) {
+const deleteUser = async function (_: Request, res: Response) {
   try {
     const user_id = res.locals.authenticated_user.user.id;
     if (user_id) {

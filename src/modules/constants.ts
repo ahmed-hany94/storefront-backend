@@ -28,7 +28,8 @@ const {
 // Constant Strings
 const USER_STATUS_MESSAGES = {
   user_created_succes: 'User Creation Successful.',
-  user_created_failed: 'User Creation Failed.'
+  user_created_failed: 'User Creation Failed.',
+  user_retrieval_failed: 'User Retrieval Failed.'
 };
 
 const DATABASE_STATUS_MESSAGES = {
