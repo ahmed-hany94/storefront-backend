@@ -1,8 +1,8 @@
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOiI1YmU0MjQ0ZC1kN2VkLTQxYjItYjI4OS01MjU3ZTYzOWI1YTQiLCJ1c2VybmFtZSI6ImFfaGFueSIsImZpcnN0bmFtZSI6ImFobWVkIiwibGFzdG5hbWUiOiJoYW55IiwiaGFzaCI6IiQyYiQxMCRBTlRrUEpqM1hwVXZSUHgySGlwM2ZPQ0E3MDZ4Q3hqcXBMS1BuLm12VVRjOU16MVc3cVhLdSIsInVzZXJfY3JlYXRlZF9hdCI6IjIwMjMtMDItMTFUMTQ6NTQ6MjUuODcwWiJ9LCJpYXQiOjE2NzYxMzQ0Njl9.9YEybiVeLKEIZMwjPp1wMeQtWzdBfQ7Xzsju3HWX6zg
-@userID = 5be4244d-d7ed-41b2-b289-5257e639b5a4
-@productID1 = 951687db-b543-4bcd-89a4-a287e1ff62f8
-@productID2 = 6c38ce28-f3a3-4e75-9d74-4ae4839097e9
-@productID3 = 1dea26a7-219f-4426-be89-2b2347f4d573
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOiIxZmEyZTAyMC02OWE2LTRjOWItODBlZS04MDllMjE3NmUzM2IiLCJ1c2VybmFtZSI6ImFfaGFueSIsImZpcnN0bmFtZSI6ImFobWVkIiwibGFzdG5hbWUiOiJoYW55IiwiaGFzaCI6IiQyYiQxMCRLOHdVSmlXdnJTRDRuZEZSVllHazd1WGovOFBUbEFTN2RpWnV2TXBYZDlRRks2Q05yVks5TyIsInVzZXJfY3JlYXRlZF9hdCI6IjIwMjMtMDItMTJUMTU6NDM6MjkuODk4WiJ9LCJpYXQiOjE2NzYyMjQwNDh9.8Gqy3JzMPx1q_1BUf9v2aAP7Zr9gNN_TJ1AGdN-d9Xo
+@userID = 1fa2e020-69a6-4c9b-80ee-809e2176e33b
+@productID1 = 3381d7b7-7b32-4765-b256-964f0ea920af
+@productID2 = cec3df70-4c57-4bb5-a001-41692e48833a
+@productID3 = bf6996ac-c032-4d62-a54b-5272bdce7794
 ####################################################################
 # User SignUp
 POST http://localhost:3000/api/users
@@ -99,7 +99,7 @@ Authorization: {{token}}
       "quantity": 2
     },
     {
-      "product_id": "{{productID2}}",
+      "product_id": "{{productID3}}",
       "quantity": 14
     }
   ],

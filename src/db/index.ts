@@ -55,10 +55,6 @@ const selectOneQuery = async function <T>(query: string, params: string[]) {
       .then((res) => {
         const rows: T[][] = res.rows;
 
-        if (rows.length === 0) {
-          throw Error(DATABASE_STATUS_MESSAGES.select_success_but_empty);
-        }
-
         releaseClient(client);
         return rows[0] as T;
       })
@@ -79,10 +75,6 @@ const selectManyQuery = async function <T>(query: string, params: string[]) {
     return client
       .query<T[]>(query, params)
       .then((res) => {
-        if (res.rows.length === 0) {
-          throw Error(DATABASE_STATUS_MESSAGES.select_success_but_empty);
-        }
-
         releaseClient(client);
         return res.rows as T;
       })
@@ -102,10 +94,6 @@ const selectAllQuery = async function <T>(query: string) {
   return client
     .query<T[]>(query)
     .then((res) => {
-      if (res.rows.length === 0) {
-        throw Error(DATABASE_STATUS_MESSAGES.select_success_but_empty);
-      }
-
       releaseClient(client);
       return res.rows as T[];
     })
@@ -139,6 +127,32 @@ const insertQuery = async function (
       });
   } catch (err) {
     return DATABASE_STATUS_MESSAGES.insert_failed;
+  }
+};
+
+const insertReturningInsertedQuery = async function (
+  query: string,
+  params: (string | number)[]
+) {
+  try {
+    const client = await getConnection();
+    return client
+      .query(query, params)
+      .then((res) => {
+        releaseClient(client);
+        return res.rows[0].order_id;
+      })
+      .catch((err) => {
+        if (err.code === '23505') {
+          releaseClient(client);
+          throw new Error(err.message);
+        } else {
+          releaseClient(client);
+          throw new Error(err.message);
+        }
+      });
+  } catch (err) {
+    if (err instanceof Error) throw new Error(err.message);
   }
 };
 
@@ -196,6 +210,7 @@ export {
   connect_db,
   deleteQuery,
   insertQuery,
+  insertReturningInsertedQuery,
   selectAllQuery,
   selectManyQuery,
   selectOneQuery,

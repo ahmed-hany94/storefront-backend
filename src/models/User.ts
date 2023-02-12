@@ -11,6 +11,7 @@ const UserSchemaError = {
   lastnameMissing: 'Lastname is missing.',
   passwordMissing: 'Password is missing.',
 
+  JWTTokenMissing: 'JsonWebTokenError: jwt must be provided',
   authorizationFailed: 'Authorization token verification failed.'
 };
 

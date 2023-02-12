@@ -6,7 +6,7 @@ const ProductSchemaError = {
 };
 
 type ProductSchema = {
-  id: string;
+  prod_id: string;
   name: string;
   price: number;
 };

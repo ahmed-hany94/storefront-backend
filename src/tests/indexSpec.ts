@@ -95,8 +95,8 @@ describe('Test endpoint responses', () => {
       .expect('Content-Type', /json/)
       .expect(200);
 
-    PROD_ID_1 = res.body.products[0].prod_id;
-    PROD_ID_2 = res.body.products[1].prod_id;
+    PROD_ID_1 = res.body.products[1].prod_id;
+    PROD_ID_2 = res.body.products[2].prod_id;
   });
 
   it('Should get product by id', async () => {
@@ -127,7 +127,9 @@ describe('Test endpoint responses', () => {
       .expect('Content-Type', /json/)
       .expect(200);
 
-    expect(res.body.message).toBe('Order Creation Successful.');
+    expect(res.body.message).toBe(
+      'Order Creation Successful, OrderProduct Creation Successful'
+    );
   });
 
   it('Should get active orders', async () => {
@@ -161,7 +163,9 @@ describe('Test endpoint responses', () => {
       .expect('Content-Type', /json/)
       .expect(200);
 
-    expect(res.body.message).toBe('Order Creation Successful.');
+    expect(res.body.message).toBe(
+      'Order Update Successful, OrderProduct Update Successful'
+    );
   });
 
   it('Should get complete orders', async () => {

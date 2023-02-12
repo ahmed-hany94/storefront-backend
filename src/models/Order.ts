@@ -1,28 +1,19 @@
-import { Request } from 'express';
-
 const OrderSchemaError = {
   statusMissing: "Order's status is missing.",
-  productIDMissing: "Order's corresponding product's id is missing.",
   userIDMissing: "Order's corresponding user's id is missing.",
-  itemsMissing: "Order's items are missing.",
-  itemsEmpty: "Order's items are empty."
+  newOrderAndNoItems: 'A new Order must have items provided, you provided none.'
 };
 
 type OrderSchema = {
-  id: string;
+  order_id: string;
   status: string;
-  quantity: number;
-  product_id: string;
   user_id: string;
 };
 
-const Order = function (requestBody: Request['body']): OrderSchema {
-  const quantity: number = requestBody.quantity;
-  const product_id: string = requestBody.product_id;
-
+const Order = function (status: string, user_id: string): OrderSchema {
   return {
-    quantity: quantity,
-    product_id: product_id
+    status: status,
+    user_id: user_id
   } as OrderSchema;
 };
 

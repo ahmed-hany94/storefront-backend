@@ -1,5 +1,68 @@
 # Storefront Backend Project
 
+## Setup:
+
+```bash
+git clone https://github.com/ahmed-hany94/storefront-backend
+
+cd storefront-backend
+
+yarn install
+```
+
+create `.env` file and fill it like below.
+
+```bash
+docker-compose up -d
+
+yarn run migrate
+
+yarn run migrate-test
+```
+
+Now you can run test
+
+```bash
+yarn run test
+```
+
+or start application
+
+```bash
+yarn start
+```
+
+## Environment:
+
+- This is my `.env` file
+
+```bash
+POSTGRES_USER='postgres'
+POSTGRES_HOST='127.0.0.1'
+POSTGRES_DB_NAME='store'
+POSTGRES_TEST_DB_NAME='store_test'
+POSTGRES_PASSWORD='password'
+JWT_SECRET="secret"
+BCRYPT_SECRET="secret"
+ENV='dev'
+PORT=3000
+DB_PORT=5432
+TEST_DB_PORT=5433
+SALT_ROUNDS=10
+```
+
+- Directory Structure:
+
+```bash
+├───controllers: Handles logic coming from routes.
+├───db: Handles database queries logic.
+├───models: Defines database schema entities.
+├───modules: Defines common utilites & constants.
+├───routes: Defines routes and middleware.
+├───services: Handles logic that spans two databases entities.
+└───tests: Defines tests
+```
+
 ## Getting Started
 
 This repo contains a basic Node and Express app to get you started in constructing an API. To get started, clone this repo and run `yarn` in your terminal at the project root.

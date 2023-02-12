@@ -7,7 +7,10 @@ import {
   UserSchema,
   UserSchemaError
 } from '../models/User';
-import { USER_STATUS_MESSAGES } from '../modules/constants';
+import {
+  DATABASE_STATUS_MESSAGES,
+  USER_STATUS_MESSAGES
+} from '../modules/constants';
 
 const isAuthenticated = async function (
   req: Request,
@@ -17,6 +20,7 @@ const isAuthenticated = async function (
   try {
     const authorizationHeader = req.headers.authorization as string;
     const token = authorizationHeader.split(' ')[1];
+    if (!token) throw new Error(UserSchemaError.JWTTokenMissing);
     const user = authorize(token);
     if (!user) {
       throw new Error(UserSchemaError.authorizationFailed);
@@ -77,6 +81,9 @@ const login = async function (req: Request, res: Response) {
 
     const query = 'SELECT * FROM "users" WHERE username = $1;';
     const user = await selectOneQuery<UserSchema>(query, [username]);
+
+    if (!user) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
+
     const token = authenticate(user, password);
 
     if (!token) throw new Error("User authentication failed. Can't login.");

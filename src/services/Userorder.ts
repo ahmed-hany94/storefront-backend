@@ -1,55 +1,149 @@
 import { Request, Response } from 'express';
 
-import { insertQuery, selectManyQuery, updateQuery } from '../db';
+import {
+  insertQuery,
+  insertReturningInsertedQuery,
+  selectManyQuery,
+  selectOneQuery,
+  updateQuery
+} from '../db';
 import { Order, OrderSchema, OrderSchemaError } from '../models/Order';
+import { OrderProduct, OrderProductSchemaError } from '../models/OrderProduct';
 import {
   DATABASE_STATUS_MESSAGES,
+  ORDER_PRODUCT_STATUS_MESSAGES,
   ORDER_STATUS_MESSAGES
 } from '../modules/constants';
 
+const getIsThereAnActiveOrder = async function (user_id: string) {
+  const query = 'SELECT order_id, status FROM orders WHERE user_id = $1';
+  const order = await selectOneQuery<OrderSchema>(query, [user_id]);
+  return order ? order : '';
+};
+
 const createUserOrder = async function (req: Request, res: Response) {
   try {
-    if (!req.body.items) throw new Error(OrderSchemaError.itemsMissing);
-    if (req.body.items.length === 0)
-      throw new Error(OrderSchemaError.itemsEmpty);
-
+    let returning_msg = '';
     if (!req.body.status) throw new Error(OrderSchemaError.statusMissing);
 
     const userID = res.locals.profile.user_id;
     if (!userID) throw new Error(OrderSchemaError.userIDMissing);
 
-    for (let i = 0; i < req.body.items.length; i++) {
-      const item = req.body.items[i];
+    const isThereAnActiveOrderRes = await getIsThereAnActiveOrder(userID);
+    if (isThereAnActiveOrderRes) {
+      // **********************************************
+      // There is an already active order
+      // **********************************************
 
-      if (!item.product_id) throw new Error(OrderSchemaError.productIDMissing);
-      const order = Order(item);
+      // If we are _completing_ the order? Update ther orders table
+      if (req.body.status === 'complete') {
+        const query =
+          "UPDATE orders SET status = 'complete' WHERE order_id = $1;";
+        const updateMessage = await updateQuery(query, [
+          isThereAnActiveOrderRes.order_id
+        ]);
+        if (updateMessage !== DATABASE_STATUS_MESSAGES.update_success)
+          throw new Error(updateMessage);
+
+        returning_msg +=
+          returning_msg.length > 0
+            ? `, ${ORDER_STATUS_MESSAGES.order_update_success}`
+            : `${ORDER_STATUS_MESSAGES.order_update_success}`;
+      }
+
+      // Are there items to add to the already active order?
+      // Insert to the order_products table
+      if (req.body.items) {
+        for (let i = 0; i < req.body.items.length; i++) {
+          const item = req.body.items[i];
+          if (!item.quantity)
+            throw new Error(OrderProductSchemaError.quantityMissing);
+          if (!item.product_id)
+            throw new Error(OrderProductSchemaError.productIDMissing);
+
+          const query =
+            'INSERT INTO "order_products" (quantity, order_id, product_id) VALUES ($1, $2, $3);';
+          const insertMessage = await insertQuery(query, [
+            item.quantity,
+            isThereAnActiveOrderRes.order_id,
+            item.product_id
+          ]);
+
+          if (insertMessage !== DATABASE_STATUS_MESSAGES.insert_success)
+            throw new Error(insertMessage);
+        }
+
+        returning_msg +=
+          returning_msg.length > 0
+            ? `, ${ORDER_PRODUCT_STATUS_MESSAGES.order_product_update_success}`
+            : `${ORDER_PRODUCT_STATUS_MESSAGES.order_product_update_success}`;
+      }
+    } else {
+      // **********************************************
+      // This is a new order
+      // **********************************************
+
+      const order = Order(req.body.status, userID);
       if (!order) throw new Error(ORDER_STATUS_MESSAGES.order_created_failed);
+      if (!req.body.items || (req.body.items && req.body.items.length === 0))
+        throw new Error(OrderSchemaError.newOrderAndNoItems);
 
+      // Validate the input
+      let orderProducts = [];
+      for (let i = 0; i < req.body.items.length; i++) {
+        const item = req.body.items[i];
+
+        if (!item.quantity)
+          throw new Error(OrderProductSchemaError.quantityMissing);
+        if (!item.product_id)
+          throw new Error(OrderProductSchemaError.productIDMissing);
+
+        const orderProduct = OrderProduct(item.quantity, item.product_id);
+        if (!orderProduct)
+          throw new Error(
+            ORDER_PRODUCT_STATUS_MESSAGES.order_product_created_failed
+          );
+        orderProducts.push(orderProduct);
+      }
+
+      // Insert into the Orders table
       const query =
-        'INSERT INTO "orders" (status, quantity, product_id, user_id) VALUES ($1, $2, $3, $4);';
-
-      const insertMessage = await insertQuery(query, [
+        'INSERT INTO "orders" (status, user_id) VALUES ($1, $2) RETURNING order_id;';
+      const orderID = await insertReturningInsertedQuery(query, [
         req.body.status,
-        order.quantity,
-        order.product_id,
         userID
       ]);
 
-      if (req.body.status === 'complete') {
+      if (!orderID) throw new Error(DATABASE_STATUS_MESSAGES.insert_failed);
+
+      // Insert into the orderProducts table
+      for (let i = 0; i < orderProducts.length; i++) {
+        const orderProductItem = orderProducts[i];
+
+        if (!orderProductItem.quantity)
+          throw new Error(OrderProductSchemaError.quantityMissing);
+        if (!orderProductItem.product_id)
+          throw new Error(OrderProductSchemaError.productIDMissing);
+
         const query =
-          "UPDATE orders SET status = 'complete' WHERE user_id = $1;";
-        const updateMessage = await updateQuery(query, [userID]);
-        if (updateMessage !== DATABASE_STATUS_MESSAGES.update_success)
-          throw new Error(updateMessage);
+          'INSERT INTO "order_products" (quantity, order_id, product_id) VALUES ($1, $2, $3);';
+        const insertMessage = await insertQuery(query, [
+          orderProductItem.quantity,
+          orderID,
+          orderProductItem.product_id
+        ]);
+
+        if (insertMessage !== DATABASE_STATUS_MESSAGES.insert_success)
+          throw new Error(insertMessage);
       }
 
-      if (insertMessage !== DATABASE_STATUS_MESSAGES.insert_success) {
-        throw new Error(insertMessage);
-      }
+      returning_msg =
+        `${ORDER_STATUS_MESSAGES.order_created_success}, ` +
+        `${ORDER_PRODUCT_STATUS_MESSAGES.order_product_created_success}`;
     }
 
     res.status(200).json({
-      message: ORDER_STATUS_MESSAGES.order_created_success
+      message: returning_msg
     });
   } catch (err) {
     console.log(err);
@@ -70,22 +164,23 @@ const getAllUserOrdersActive = async function (req: Request, res: Response) {
   try {
     const userID = res.locals.profile.user_id;
     if (!userID) throw new Error(OrderSchemaError.userIDMissing);
-
     const query =
       'SELECT name, price, status, quantity FROM' +
       ' ' +
-      '"products" as p JOIN "orders" as o' +
+      '"orders" as o JOIN "order_products" as op' +
       ' ' +
-      'ON o.product_id = p.prod_id' +
+      'ON o.order_id = op.order_id' +
+      ' ' +
+      'JOIN "products" as p' +
+      ' ' +
+      'ON op.product_id = p.prod_id' +
       ' ' +
       'WHERE user_id = $1 and' +
       ' ' +
       "status = 'active'" +
       ';';
-
     const order = await selectManyQuery<OrderSchema>(query, [userID]);
     if (!order) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
-
     res.status(200).json({ order: order });
   } catch (err) {
     if (err instanceof Error)
@@ -105,13 +200,16 @@ const getAllUserOrdersCompleted = async function (req: Request, res: Response) {
   try {
     const userID = res.locals.profile.user_id;
     if (!userID) throw new Error(OrderSchemaError.userIDMissing);
-
     const query =
       'SELECT name, price, status, quantity FROM' +
       ' ' +
-      '"products" as p JOIN "orders" as o' +
+      '"orders" as o JOIN "order_products" as op' +
       ' ' +
-      'ON o.product_id = p.prod_id' +
+      'ON o.order_id = op.order_id' +
+      ' ' +
+      'JOIN "products" as p' +
+      ' ' +
+      'ON op.product_id = p.prod_id' +
       ' ' +
       'WHERE user_id = $1 and' +
       ' ' +
@@ -120,7 +218,6 @@ const getAllUserOrdersCompleted = async function (req: Request, res: Response) {
 
     const order = await selectManyQuery<OrderSchema>(query, [userID]);
     if (!order) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
-
     res.status(200).json({ order: order });
   } catch (err) {
     if (err instanceof Error)
@@ -140,19 +237,20 @@ const getAllUserOrders = async function (req: Request, res: Response) {
   try {
     const userID = res.locals.profile.user_id;
     if (!userID) throw new Error(OrderSchemaError.userIDMissing);
-
     const query =
       'SELECT name, price, status, quantity FROM' +
       ' ' +
-      '"products" as p JOIN "orders" as o' +
+      '"orders" as o JOIN "order_products" as op' +
       ' ' +
-      'ON o.product_id = p.prod_id' +
+      'ON o.order_id = op.order_id' +
+      ' ' +
+      'JOIN "products" as p' +
+      ' ' +
+      'ON op.product_id = p.prod_id' +
       ' ' +
       'WHERE user_id = $1;';
-
     const order = await selectManyQuery<OrderSchema>(query, [userID]);
     if (!order) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
-
     res.status(200).json({ order: order });
   } catch (err) {
     if (err instanceof Error)

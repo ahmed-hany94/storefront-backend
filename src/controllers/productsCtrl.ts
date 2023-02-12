@@ -75,7 +75,11 @@ const getProduct = async function (req: Request, res: Response) {
 const listProducts = async function (req: Request, res: Response) {
   try {
     const query = 'SELECT * FROM "products";';
+
     const products = await selectAllQuery(query);
+
+    if (!products) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
+
     res.status(200).json({ products: products });
   } catch (err) {
     if (err instanceof Error)
