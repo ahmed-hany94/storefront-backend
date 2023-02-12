@@ -1,5 +1,11 @@
 import express, { Router } from 'express';
-import { hasAuthroization, isAuthenticated, login, logout } from './authCtrl';
+
+import {
+  hasAuthroization,
+  isAuthenticated,
+  login,
+  logout
+} from '../controllers/authCtrl';
 import {
   createUser,
   getUser,
@@ -14,7 +20,12 @@ import {
   productByID,
   getProduct
 } from '../controllers/productsCtrl';
-import { createUserOrder, getUserOrder } from '../services';
+import {
+  createUserOrder,
+  getAllUserOrders,
+  getAllUserOrdersActive,
+  getAllUserOrdersCompleted
+} from '../services/Userorder';
 
 const router: Router = express.Router();
 
@@ -23,9 +34,18 @@ router.route('/auth/login').post(login);
 router.route('/auth/logout').get(logout);
 
 // user's order
+
+router
+  .route('/users/:userID/orders/active')
+  .get(isAuthenticated, hasAuthroization, getAllUserOrdersActive);
+
+router
+  .route('/users/:userID/orders/completed')
+  .get(isAuthenticated, hasAuthroization, getAllUserOrdersCompleted);
+
 router
   .route('/users/:userID/orders')
-  .get(isAuthenticated, hasAuthroization, getUserOrder)
+  .get(isAuthenticated, hasAuthroization, getAllUserOrders)
   .post(isAuthenticated, hasAuthroization, createUserOrder);
 
 // users

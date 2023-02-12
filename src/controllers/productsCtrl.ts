@@ -1,32 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { getConnection } from '../db';
-
-const listProducts = async function (req: Request, res: Response) {
-  try {
-    const client = await getConnection();
-    const result = await client.query(`SELECT * FROM "products"`);
-    client.release();
-    res.status(200).json(result.rows);
-  } catch (err) {
-    res.status(400).json({
-      message: err
-    });
-  }
-};
+import { insertQuery, selectAllQuery, selectOneQuery } from '../db';
+import { Product, ProductSchema, ProductSchemaError } from '../models/Product';
+import {
+  DATABASE_STATUS_MESSAGES,
+  PRODUCT_STATUS_MESSAGES
+} from '../modules/constants';
 
 const createProducts = async function (req: Request, res: Response) {
   try {
-    const { name, price } = req.body;
-    const client = await getConnection();
+    if (!req.body.name) throw new Error(ProductSchemaError.nameMissing);
+    if (!req.body.price) throw new Error(ProductSchemaError.priceMissing);
+
+    const product = Product(req.body);
+    if (!product)
+      throw new Error(PRODUCT_STATUS_MESSAGES.product_created_failed);
+
     const query = 'INSERT INTO "products" (name, price) VALUES ($1, $2);';
-    await client.query(query, [name, price]);
-    client.release();
-    res.status(200).json({ message: 'Product inserted.' });
+    const status = await insertQuery(query, [product.name, product.price]);
+    if (status === DATABASE_STATUS_MESSAGES.insert_success) {
+      res.status(200).json({
+        message: DATABASE_STATUS_MESSAGES.insert_success,
+        created_product: product
+      });
+    } else {
+      throw new Error(status);
+    }
   } catch (err) {
-    res.status(400).json({
-      message: err
-    });
+    if (err instanceof Error)
+      res.status(400).json({
+        Error: err.message
+      });
+    else {
+      console.log(err);
+      res.status(400).json({
+        Error: PRODUCT_STATUS_MESSAGES.product_created_failed
+      });
+    }
   }
 };
 
@@ -37,26 +47,48 @@ const productByID = async function (
   id: string
 ) {
   try {
-    const client = await getConnection();
-    const query = 'SELECT * FROM "products" WHERE id = $1;';
-    const result = await client.query(query, [id]);
+    const query = 'SELECT * FROM "products" WHERE prod_id = $1;';
+    const product = await selectOneQuery<ProductSchema>(query, [id]);
 
-    if (result.rows.length) {
-      const product = result.rows[0];
-      res.locals.product = product;
-      next();
-    } else {
-      res.status(400).json({ message: 'Failed to retrieve product.' });
-    }
+    if (!product) throw new Error(DATABASE_STATUS_MESSAGES.select_failed);
+
+    res.locals.product = product;
+    next();
   } catch (err) {
-    // TODO: better error message
-    console.log(err);
-    res.status(400).json({ message: 'Failed to retrieve product.' });
+    if (err instanceof Error)
+      res.status(400).json({
+        Error: err.message
+      });
+    else {
+      console.log(err);
+      res.status(400).json({
+        Error: DATABASE_STATUS_MESSAGES.select_failed
+      });
+    }
   }
 };
 
 const getProduct = async function (req: Request, res: Response) {
-  res.status(200).json({ message: res.locals.product });
+  res.status(200).json({ product: res.locals.product });
+};
+
+const listProducts = async function (req: Request, res: Response) {
+  try {
+    const query = 'SELECT * FROM "products";';
+    const products = await selectAllQuery(query);
+    res.status(200).json({ products: products });
+  } catch (err) {
+    if (err instanceof Error)
+      res.status(400).json({
+        Error: err.message
+      });
+    else {
+      console.log(err);
+      res.status(400).json({
+        Error: DATABASE_STATUS_MESSAGES.select_failed
+      });
+    }
+  }
 };
 
 export { createProducts, getProduct, listProducts, productByID };

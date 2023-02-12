@@ -10,25 +10,31 @@
 [X] user to delete himself + authorization
 [X] user to update himself + authorization
 [X] testing db docker
+[X] refactor user update for the switch stmt to build the query string
+[X] refactor res.local
+[X] delineate between database and controllers ?? (expose db functions)
+[X] Make good error handling message (search for all TODOs)
+[X] think about db design
+[X] logout
+[X] delineate between models and controllers ??
+[X] Rehash password after updating it
+[X] created_at
+[X] testing
+[X] Check readme.md (add .env)
 =================================
-[] refactor res.local
-[] refactor user update for the switch stmt to build the query string
-[-] logout
+[] check if already has an order
+[] update product
+[] add to order
+[] check if already logged in
+[] some errors need to be returned like Database Select Succeeded but no rows came back
 [-] returned token, make it http-only + research security
 [-] logging
     [] replace console.log with logger
-[-] testing
-[-] delineate between models and controllers ??
-[-] delineate between database and controllers ?? (expose db functions)
-[-] Make good error handling message (search for all TODOs)
-[] created_at
 [] updates_at
-[] uuid are a bit long, research for something shorter
 [] Add middleware for express [helmet, compress, cors]
 [] comment code
-[] order imports
+[] order imports alphabetically and remove unused imports
 [] see how a real database is like
-[] try on another laptop
 [] insert many (search for any insert operation & handle many inserts)
 [] [optional] completed order by user + authorization
 [] [optional] get top most popular products
@@ -39,18 +45,4 @@
 [] Write another migration script for inserting/deleting after every thing is working
    and you have committed you work to have a save point.
 [] Check requirements.md
-[] Check readme.md (add .env)
-=================================
-[] ask about scale
-[] ask about sharding
-[] ask about error handling
 
-I have a somewhat meta-question.
-My code got accepted and everything, but I don't know if this code
-is acceptable in a real-world setting where things are run on "scale".
-This makes this course being called "advanced" a bit disappointing.
-I appreciate that we are being taught the "best practices" but it still
-feels like a hello-world-get-started app that I wouldn't have the confidence
-to sell to people.
-In short, code works in a single-user tested, local app developed, tutorial hand-held
-way, not so sure for a real-world setting (a cigarette kiosk damn near even)?

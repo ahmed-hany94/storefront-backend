@@ -1,5 +1,6 @@
-import express, { Express, json } from 'express';
 import cookieParser from 'cookie-parser';
+import express, { Express, json } from 'express';
+
 import { PORT } from './modules/constants';
 import { connect_db } from './db';
 import { router } from './routes';

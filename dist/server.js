@@ -63,8 +63,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
-var express_1 = __importStar(require("express"));
 var cookie_parser_1 = __importDefault(require("cookie-parser"));
+var express_1 = __importStar(require("express"));
 var constants_1 = require("./modules/constants");
 var db_1 = require("./db");
 var routes_1 = require("./routes");

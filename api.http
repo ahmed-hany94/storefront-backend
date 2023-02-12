@@ -1,6 +1,8 @@
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiZDgxNDQ5YWYtOWIxMi00OTAzLTkxZWEtOTQ5MGUzMGMyNDAwIiwidXNlcm5hbWUiOiJhX2hhbnkiLCJmaXJzdG5hbWUiOiJhaG1lZCIsImxhc3RuYW1lIjoiaGFueSIsImhhc2giOiIkMmIkMTAkeTVaVmxQMFVlZS9iRzNyQkNPeXE5dVhoZi9lZ0FIQUoyZWUwbmRMd3FoZTVnSzJoS2ozL2EifSwiaWF0IjoxNjc0NjcxOTMzfQ.E_fg5c2RMozR1mgcQD49lXJMfNYACl_IKBbPLHYf-vU
-@userID = d81449af-9b12-4903-91ea-9490e30c2400
-@productID = 
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJfaWQiOiI1YmU0MjQ0ZC1kN2VkLTQxYjItYjI4OS01MjU3ZTYzOWI1YTQiLCJ1c2VybmFtZSI6ImFfaGFueSIsImZpcnN0bmFtZSI6ImFobWVkIiwibGFzdG5hbWUiOiJoYW55IiwiaGFzaCI6IiQyYiQxMCRBTlRrUEpqM1hwVXZSUHgySGlwM2ZPQ0E3MDZ4Q3hqcXBMS1BuLm12VVRjOU16MVc3cVhLdSIsInVzZXJfY3JlYXRlZF9hdCI6IjIwMjMtMDItMTFUMTQ6NTQ6MjUuODcwWiJ9LCJpYXQiOjE2NzYxMzQ0Njl9.9YEybiVeLKEIZMwjPp1wMeQtWzdBfQ7Xzsju3HWX6zg
+@userID = 5be4244d-d7ed-41b2-b289-5257e639b5a4
+@productID1 = 951687db-b543-4bcd-89a4-a287e1ff62f8
+@productID2 = 6c38ce28-f3a3-4e75-9d74-4ae4839097e9
+@productID3 = 1dea26a7-219f-4426-be89-2b2347f4d573
 ####################################################################
 # User SignUp
 POST http://localhost:3000/api/users
@@ -55,7 +57,7 @@ Content-Type: application/json
 }
 
 ####################################################################
-# User Signout
+# User Logout
 GET http://localhost:3000/api/auth/logout
 Content-Type: application/json
 
@@ -71,13 +73,13 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "name": "product1",
+  "name": "product",
   "price": 9.99
 }
 
 ####################################################################
-# Create Product by ID
-GET http://localhost:3000/api/products/{{productID}}
+# Get Product by ID
+GET http://localhost:3000/api/products/{{productID2}}
 Content-Type: application/json
 
 ####################################################################
@@ -87,13 +89,38 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "product_id": "987f24fa-467d-403e-8fc9-8c50d700c13a",
+  "items": [
+    {
+      "product_id": "{{productID1}}",
+      "quantity": 3
+    },
+    {
+      "product_id": "{{productID2}}",
+      "quantity": 2
+    },
+    {
+      "product_id": "{{productID2}}",
+      "quantity": 14
+    }
+  ],
   "status": "active"
 }
 
 ####################################################################
 # Get a User's order
 GET http://localhost:3000/api/users/{{userID}}/orders
+Content-Type: application/json
+Authorization: {{token}}
+
+####################################################################
+# Get a User's active order
+GET http://localhost:3000/api/users/{{userID}}/orders/active
+Content-Type: application/json
+Authorization: {{token}}
+
+####################################################################
+# Get a User's completed order
+GET http://localhost:3000/api/users/{{userID}}/orders/completed
 Content-Type: application/json
 Authorization: {{token}}
 

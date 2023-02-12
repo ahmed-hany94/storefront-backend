@@ -1,26 +1,32 @@
 import { Request } from 'express';
 import { compareSync, hashSync } from 'bcrypt';
-import { BCRYPT_SECRET, JWT_SECRET, SALT_ROUNDS } from '../modules/constants';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
 
+import { BCRYPT_SECRET, JWT_SECRET, SALT_ROUNDS } from '../modules/constants';
+
 const UserSchemaError = {
-  usernameIsMissing: 'Username is missing.',
-  usernameIsNotUnique: 'Username is not unique.',
-  firstnameIsMissing: 'Firstname is missing.',
-  lastnameIsMissing: 'Lastname is missing.',
-  passwordIsMissing: 'Password is missing.',
+  usernameMissing: 'Username is missing.',
+  usernameNotUnique: 'Username is not unique.',
+  firstnameMissing: 'Firstname is missing.',
+  lastnameMissing: 'Lastname is missing.',
+  passwordMissing: 'Password is missing.',
 
   authorizationFailed: 'Authorization token verification failed.'
 };
 
 type UserSchema = {
-  id: string;
+  user_id: string;
   username: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   hash: string;
   error: string;
 };
+
+const hashPassword = function (password: string) {
+  return hashSync(password + BCRYPT_SECRET, parseInt(SALT_ROUNDS as string));
+};
+
 const User = function (requestBody: Request['body']): UserSchema {
   const uname = requestBody.username;
   const fname = requestBody.firstName;
@@ -28,32 +34,29 @@ const User = function (requestBody: Request['body']): UserSchema {
   const passwd = requestBody.password;
 
   if (uname && fname && lname && passwd) {
-    const _hash = hashSync(
-      passwd + BCRYPT_SECRET,
-      parseInt(SALT_ROUNDS as string)
-    );
+    const hash = hashPassword(passwd);
 
     return {
       username: uname,
-      firstName: fname,
-      lastName: lname,
-      hash: _hash
+      firstname: fname,
+      lastname: lname,
+      hash: hash
     } as UserSchema;
   } else if (!uname) {
     return {
-      error: UserSchemaError.usernameIsMissing
+      error: UserSchemaError.usernameMissing
     } as UserSchema;
   } else if (!fname) {
     return {
-      error: UserSchemaError.firstnameIsMissing
+      error: UserSchemaError.firstnameMissing
     } as UserSchema;
   } else if (!lname) {
     return {
-      error: UserSchemaError.lastnameIsMissing
+      error: UserSchemaError.lastnameMissing
     } as UserSchema;
   } else {
     return {
-      error: UserSchemaError.passwordIsMissing
+      error: UserSchemaError.passwordMissing
     } as UserSchema;
   }
 };
@@ -78,4 +81,11 @@ const authorize = function (token: string): UserSchema {
     } as UserSchema;
   }
 };
-export { authenticate, authorize, User, UserSchema };
+export {
+  authenticate,
+  authorize,
+  hashPassword,
+  User,
+  UserSchema,
+  UserSchemaError
+};
